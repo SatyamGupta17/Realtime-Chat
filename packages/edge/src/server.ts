@@ -1,54 +1,27 @@
 import http from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { randomUUID } from "crypto";
+import { addConnection, removeConnection, broadcast } from "./connections";
+import { redisPublisher, redisSubscriber, connectRedis} from "./redis";
+import {connectKafka, publishMessage} from "./kafka";
 
-import {
-  addConnection,
-  removeConnection,
-  broadcast,
-} from "./connections";
-
-import {
-  redisPublisher,
-  redisSubscriber,
-  connectRedis,
-} from "./redis";
-
-import {
-  connectKafka,
-  publishMessage,
-} from "./kafka";
-
-const EDGE_ID =
-  process.env.EDGE_ID ?? `edge-${randomUUID()}`;
+const EDGE_ID = process.env.EDGE_ID ?? `edge-${randomUUID()}`;
 
 const PORT =
   Number(process.env.PORT) || 4001;
 
 const server = http.createServer();
 
-const wss = new WebSocketServer({
-  server,
-});
+const wss = new WebSocketServer({server,});
 
 async function main() {
 
   await connectRedis();
   await connectKafka();
-
-  /*
-   * Every edge server subscribes to all chat events.
-   */
   await redisSubscriber.subscribe(
     "chat:events",
     (rawMessage) => {
-
       const event = JSON.parse(rawMessage);
-
-      /*
-       * Send event to users connected
-       * to this particular edge server.
-       */
       broadcast(
         event.channelId,
         event
@@ -63,65 +36,40 @@ async function main() {
       `http://${request.headers.host}`
     );
 
-    const channelId =
-      url.searchParams.get("channelId");
-
-    const userId =
-      url.searchParams.get("userId");
+    const channelId = url.searchParams.get("channelId");
+    const userId = url.searchParams.get("userId");
 
     if (!channelId || !userId) {
       socket.close();
       return;
     }
 
-    addConnection(
-      channelId,
-      socket
-    );
+    addConnection(channelId, socket);
 
-    console.log(
-      `${userId} connected to ${channelId} on ${EDGE_ID}`
-    );
+    console.log(`${userId} connected to ${channelId} on ${EDGE_ID}`);
 
     socket.on("message", async (raw) => {
 
-      const input = JSON.parse(
-        raw.toString()
-      );
+      const input = JSON.parse(raw.toString());
 
-      if (input.type !== "message.send") {
-        return;
-      }
+      if (input.type !== "message.send") {return;}
 
       const event = {
         eventId: randomUUID(),
         type: "message.created",
-
         channelId,
-
         messageId: randomUUID(),
-
         userId,
-
         message: input.message,
-
         timestamp:
           new Date().toISOString(),
-
         edgeId: EDGE_ID,
       };
 
-      /*
-       * Publish to Redis.
-       *
-       * Every edge server receives this.
-       */
       await redisPublisher.publish(
         "chat:events",
         JSON.stringify(event)
       );
-
-        // Durable event processing
       await publishMessage(event);
     });
 
@@ -134,9 +82,7 @@ async function main() {
   });
 
   server.listen(PORT, () => {
-    console.log(
-      `${EDGE_ID} listening on :${PORT}`
-    );
+    console.log(`${EDGE_ID} listening on :${PORT}`);
   });
 }
 
