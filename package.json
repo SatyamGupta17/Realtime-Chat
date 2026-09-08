@@ -1,0 +1,31 @@
+{
+  "name": "realtime-chat",
+  "version": "1.0.0",
+  "description": "A real-time chat application using Node.js, Express, WebSocket, Kafka, PostgreSQL, and Redis.",
+  "main": "index.js",
+  "scripts": {
+    "api": "tsx packages/api/src/server.ts",
+    "edge": "tsx packages/edge/src/server.ts",
+    "worker": "tsx packages/worker/src/worker.ts",
+    "test-edge": "tsx packages/edge/src/test-edge.ts",
+    "start": "tsx index.ts",
+    "dev": "tsx watch index.ts"
+  },
+  "author": "Satyam Gupta",
+  "dependencies": {
+    "express": "^5.2.1",
+    "kafkajs": "^2.2.4",
+    "pg": "^8.23.0",
+    "redis": "^6.2.1",
+    "uuid": "^14.0.2",
+    "ws": "^8.21.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.5.0",
+    "@types/pg": "^8.23.1",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}
