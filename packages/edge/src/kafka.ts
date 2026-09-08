@@ -8,12 +8,10 @@ export const kafka = new Kafka({
   ],
 });
 
-export const producer =
-  kafka.producer();
+export const producer = kafka.producer();
 
 export async function connectKafka() {
   await producer.connect();
-
   console.log("Kafka producer connected");
 }
 
@@ -24,7 +22,8 @@ export async function publishMessage(
     topic: "chat.messages",
     messages: [
       {
-        value: JSON.stringify(event),
+        key : (event as { workspaceId: string }).workspaceId,
+        value: JSON.stringify(event)
       },
     ],
   });

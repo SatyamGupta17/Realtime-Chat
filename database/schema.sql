@@ -17,6 +17,7 @@ CREATE TABLE messages (
     channel_id UUID NOT NULL REFERENCES channel(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
     user_id UUID NOT NULL,
+    -- workspace_id UUID NOT NULL REFERENCES workspace(id) ON DELETE CASCADE,
     ts TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 

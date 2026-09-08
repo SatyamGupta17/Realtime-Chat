@@ -4,12 +4,13 @@
   "description": "A real-time chat application using Node.js, Express, WebSocket, Kafka, PostgreSQL, and Redis.",
   "main": "index.js",
   "scripts": {
-    "api": "tsx packages/api/src/server.ts",
-    "edge": "tsx packages/edge/src/server.ts",
-    "worker": "tsx packages/worker/src/worker.ts",
+    "dev:api": "tsx packages/api/src/server.ts",
+    "dev:edge": "tsx packages/edge/src/server.ts",
+    "dev:worker": "tsx packages/worker/src/worker.ts",
     "test-edge": "tsx packages/edge/src/test-edge.ts",
-    "start": "tsx index.ts",
-    "dev": "tsx watch index.ts"
+    "test-shard": "tsx packages/api/src/test-sharding.ts", 
+    "test-worker": "tsx packages/worker/src/test-kafka.ts",
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:edge\" \"npm run dev:worker\""
   },
   "author": "Satyam Gupta",
   "dependencies": {
@@ -24,7 +25,9 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.5.0",
     "@types/pg": "^8.23.1",
-    "@types/ws": "^8.18.1",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.18.1",    
+    "concurrently": "^9.0.0",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   }

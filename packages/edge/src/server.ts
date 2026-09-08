@@ -1,14 +1,13 @@
 import http from "http";
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocketServer } from "ws";
 import { randomUUID } from "crypto";
 import { addConnection, removeConnection, broadcast } from "./connections";
-import { redisPublisher, redisSubscriber, connectRedis} from "./redis";
+import { redisPublisher, redisSubscriber, connectRedis } from "./redis";
 import {connectKafka, publishMessage} from "./kafka";
 
 const EDGE_ID = process.env.EDGE_ID ?? `edge-${randomUUID()}`;
 
-const PORT =
-  Number(process.env.PORT) || 4001;
+const PORT = Number(process.env.PORT) || 4001;
 
 const server = http.createServer();
 
@@ -19,7 +18,7 @@ async function main() {
   await connectRedis();
   await connectKafka();
   await redisSubscriber.subscribe(
-    "chat:events",
+    "chat:messages.realtime",
     (rawMessage) => {
       const event = JSON.parse(rawMessage);
       broadcast(
@@ -36,10 +35,11 @@ async function main() {
       `http://${request.headers.host}`
     );
 
+    const workspaceId = url.searchParams.get("workspaceId");
     const channelId = url.searchParams.get("channelId");
     const userId = url.searchParams.get("userId");
 
-    if (!channelId || !userId) {
+    if (!workspaceId || !channelId || !userId) {
       socket.close();
       return;
     }
@@ -49,28 +49,36 @@ async function main() {
     console.log(`${userId} connected to ${channelId} on ${EDGE_ID}`);
 
     socket.on("message", async (raw) => {
+      try {
+        const input = JSON.parse(raw.toString());
 
-      const input = JSON.parse(raw.toString());
+        if (input.type !== "message.send") {return;}
 
-      if (input.type !== "message.send") {return;}
+        const event = {
+          eventId: randomUUID(),
+          type: "message.created",
+          workspaceId,
+          channelId,
+          messageId: randomUUID(),
+          userId,
+          message: input.message,
+          timestamp:
+            new Date().toISOString(),
+          edgeId: EDGE_ID,
+        };
 
-      const event = {
-        eventId: randomUUID(),
-        type: "message.created",
-        channelId,
-        messageId: randomUUID(),
-        userId,
-        message: input.message,
-        timestamp:
-          new Date().toISOString(),
-        edgeId: EDGE_ID,
-      };
-
-      await redisPublisher.publish(
-        "chat:events",
-        JSON.stringify(event)
-      );
-      await publishMessage(event);
+        // Realtime delivery
+        await redisPublisher.publish(
+          "chat:messages.realtime",
+          JSON.stringify(event)
+        );
+        await publishMessage(event);
+      } catch (error) {
+        console.error(
+          "Failed to process WebSocket message:",
+          error
+        );
+      }
     });
 
     socket.on("close", () => {
@@ -86,4 +94,4 @@ async function main() {
   });
 }
 
-main();
+main().catch(console.error);
