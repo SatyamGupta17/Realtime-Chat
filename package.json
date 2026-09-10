@@ -8,13 +8,19 @@
     "dev:edge": "tsx packages/edge/src/server.ts",
     "dev:worker": "tsx packages/worker/src/worker.ts",
     "test-edge": "tsx packages/edge/src/test-edge.ts",
-    "test-shard": "tsx packages/api/src/test-sharding.ts", 
+    "test-shard": "tsx packages/api/src/test-sharding.ts",
     "test-worker": "tsx packages/worker/src/test-kafka.ts",
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:edge\" \"npm run dev:worker\""
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:edge\" \"npm run dev:worker\"",
+    "docker:start": "docker-compose up --build",
+    "docker:stop": "docker-compose down"
   },
   "author": "Satyam Gupta",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "kafkajs": "^2.2.4",
     "pg": "^8.23.0",
     "redis": "^6.2.1",
@@ -22,11 +28,13 @@
     "ws": "^8.21.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.5.0",
     "@types/pg": "^8.23.1",
     "@types/uuid": "^10.0.0",
-    "@types/ws": "^8.18.1",    
+    "@types/ws": "^8.18.1",
     "concurrently": "^9.0.0",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
