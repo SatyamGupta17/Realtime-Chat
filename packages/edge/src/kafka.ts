@@ -1,4 +1,5 @@
 import { Kafka } from "kafkajs";
+import "dotenv/config";
 
 export const kafka = new Kafka({
   clientId: "chat-edge",
@@ -18,12 +19,17 @@ export async function connectKafka() {
 export async function publishMessage(
   event: unknown
 ) {
+  const messageEvent =
+    event as {
+      workspaceId: string;
+    };
+
   await producer.send({
     topic: "chat.messages",
     messages: [
       {
-        key : (event as { workspaceId: string }).workspaceId,
-        value: JSON.stringify(event)
+        key: messageEvent.workspaceId,
+        value: JSON.stringify(event),
       },
     ],
   });

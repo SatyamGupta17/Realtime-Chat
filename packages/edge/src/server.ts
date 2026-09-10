@@ -30,7 +30,7 @@ import "dotenv/config";
 
 const EDGE_ID = process.env.EDGE_ID ?? `edge-${randomUUID()}`;
 
-const PORT = Number(process.env.PORT) || 4001;
+const PORT = Number(process.env.EDGE_PORT) || 4001;
 
 const JWT_SECRET = process.env.JWT_SECRET ??  "dev-secret-change-me";
 

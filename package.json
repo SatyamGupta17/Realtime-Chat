@@ -11,8 +11,8 @@
     "test-shard": "tsx packages/api/src/test-sharding.ts",
     "test-worker": "tsx packages/worker/src/test-kafka.ts",
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:edge\" \"npm run dev:worker\"",
-    "docker:start": "docker-compose up --build",
-    "docker:stop": "docker-compose down"
+    "docker:start": "docker compose up --build",
+    "docker:stop": "docker compose down"
   },
   "author": "Satyam Gupta",
   "dependencies": {

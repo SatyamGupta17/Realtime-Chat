@@ -3,4 +3,11 @@
 /implementation.md
 /node_modules
 /database.md
-/.env
+/deployment.md
+.env.local
+.env
+.env.production
+.env.*.local
+
+node_modules/
+dist/

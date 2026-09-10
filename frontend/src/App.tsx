@@ -8,10 +8,10 @@ import {
 import "./App.css";
 
 const API_URL =
-  "http://localhost:3000";
+  import.meta.env.VITE_API_URL;
 
 const WS_URL =
-  "ws://localhost:8080";
+  import.meta.env.VITE_WS_URL;
 
 /* =====================================================
    TYPES
@@ -1605,11 +1605,6 @@ function App() {
               message,
               index
             ) => {
-              const userId =
-                getUserId(
-                  message
-                );
-
               const userName =
                 getUserName(
                   message,

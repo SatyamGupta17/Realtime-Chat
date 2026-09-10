@@ -1,6 +1,7 @@
 import { Kafka } from "kafkajs";
-import { getShard} from '../../api/src/sharding';
-import { getDatabase} from '../../api/src/shard-db';
+import { getShard} from './sharding';
+import { getDatabase} from './shard-db';
+import "dotenv/config";
 
 const kafka = new Kafka({
   clientId: "chat-persistence-worker",

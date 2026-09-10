@@ -19,6 +19,8 @@ const PORT = Number(process.env.API_PORT ?? 3000);
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
 
+const FRONTEND_URL =
+  process.env.FRONTEND_URL ?? "http://localhost:5173";
 // Types
 type AuthUser = {
   id: string;
@@ -30,7 +32,7 @@ type AuthRequest = Request & {
   user?: AuthUser;
 };
  
-app.use(cors({origin: "http://localhost:5173",}));
+app.use(cors({origin: FRONTEND_URL,}));
 
 app.use(express.json());
 
